@@ -1,0 +1,171 @@
+*ghopen.txt*    Open GitHub URLs from Vim/Neovim
+
+Author:  kis9a
+License: MIT
+
+==============================================================================
+1. Introduction                                              *ghopen-intro*
+
+vim-ghopen is a Vim/Neovim plugin that generates GitHub URLs from the
+current buffer and opens them in a browser or copies them to the clipboard.
+
+Features:
+- Open file, line, or line range on GitHub
+- Generate permalink (commit-based immutable URL)
+- Open blame view
+- Open compare/PR creation page
+- Copy URL to clipboard
+
+Requirements:
+- Vim 8.0+ or Neovim
+- git
+
+==============================================================================
+2. Commands                                                *ghopen-commands*
+
+                                                                  *:GhOpen*
+:[range]GhOpen
+    Open the current file on GitHub in the browser. If a range is given,
+    the line range anchor (#Lx-Ly) is appended to the URL.
+
+                                                         *:GhOpenPermalink*
+:[range]GhOpenPermalink
+    Open the current file on GitHub using a permalink (commit SHA reference).
+    The URL will not change even if the branch is updated.
+
+                                                                  *:GhCopy*
+:[range]GhCopy
+    Copy the GitHub URL of the current file to the clipboard.
+    If a range is given, the line range anchor is included.
+
+                                                         *:GhCopyPermalink*
+:[range]GhCopyPermalink
+    Copy the GitHub permalink of the current file to the clipboard.
+
+                                                             *:GhOpenBlame*
+:[range]GhOpenBlame
+    Open the blame view for the current file on GitHub.
+    If a range is given, the line anchor is included.
+
+                                                           *:GhOpenCompare*
+:GhOpenCompare
+    Open the compare page on GitHub (default branch...current branch).
+    Useful for reviewing changes before creating a PR.
+
+                                                               *:GhOpenPR*
+:GhOpenPR
+    Alias for |:GhOpenCompare|. Opens the compare page on GitHub,
+    where you can click "Create pull request".
+
+==============================================================================
+3. Options                                                 *ghopen-options*
+
+                                                          *g:ghopen_remote*
+g:ghopen_remote (default: 'origin')
+    The git remote name to use for URL generation.
+
+                                                  *g:ghopen_default_branch*
+g:ghopen_default_branch (default: '')
+    Override the default branch for compare URLs. If empty, the plugin
+    auto-detects using remote HEAD, then falls back to 'main' or 'master'.
+
+                                                         *g:ghopen_browser*
+g:ghopen_browser (default: auto-detect)
+    Override the browser command. Can be a string or list.
+    Example: >
+        let g:ghopen_browser = 'firefox'
+        let g:ghopen_browser = ['firefox', '--new-tab']
+<
+
+                                                       *g:ghopen_clipboard*
+g:ghopen_clipboard (default: auto-detect)
+    Override the clipboard command. Can be a string or list.
+    Example: >
+        let g:ghopen_clipboard = 'xclip'
+<
+
+                                                           *g:ghopen_debug*
+g:ghopen_debug (default: 0)
+    Enable debug notifications (e.g., show URL on open).
+
+==============================================================================
+4. Key Mappings (Example)                                *ghopen-mappings*
+
+No default mappings are provided. Here are suggested mappings: >
+
+    nmap go <Cmd>GhOpen<CR>
+    vmap go :GhOpen<CR>
+    nmap gO <Cmd>GhCopy<CR>
+    vmap gO :GhCopy<CR>
+    nmap gp <Cmd>GhOpenPermalink<CR>
+    vmap gp :GhOpenPermalink<CR>
+    nmap gP <Cmd>GhCopyPermalink<CR>
+    vmap gP :GhCopyPermalink<CR>
+    nmap gb <Cmd>GhOpenBlame<CR>
+    vmap gb :GhOpenBlame<CR>
+    nmap gc <Cmd>GhOpenCompare<CR>
+<
+
+==============================================================================
+5. Functions                                             *ghopen-functions*
+
+                                                              *ghopen#url()*
+ghopen#url({opts})
+    Generate a GitHub URL. {opts} is a dictionary:
+      'type':      'blob', 'blame', or 'compare'
+      'permalink': 0 or 1
+      'line1':     line number (0 = no line)
+      'line2':     line number (0 = no line)
+    Returns a dict: {'ok': bool, 'url': string, 'error': string}
+
+                                                             *ghopen#open()*
+ghopen#open({opts})
+    Generate a URL and open it in the browser.
+
+                                                             *ghopen#copy()*
+ghopen#copy({opts})
+    Generate a URL and copy it to the clipboard.
+
+==============================================================================
+6. Errors                                                  *ghopen-errors*
+
+The following error messages may be displayed:
+
+    ghopen: git is not executable
+        git command not found.
+
+    ghopen: not a git repository
+        Current buffer is not in a git repository.
+
+    ghopen: remote "origin" not found
+        The configured remote does not exist.
+
+    ghopen: remote URL is not GitHub or unsupported format
+        The remote URL could not be parsed as a GitHub URL.
+
+    ghopen: no file in current buffer
+        No file is associated with the current buffer (unnamed buffer etc.).
+
+    ghopen: file is not tracked by git
+        The current file is not tracked by git.
+
+    ghopen: cannot determine current ref
+        Could not resolve the current branch or HEAD commit SHA.
+
+    ghopen: default branch not detected; set g:ghopen_default_branch
+        Could not determine the default branch for compare.
+
+    ghopen: no browser command available
+        No browser open command detected.
+
+    ghopen: no clipboard command available
+        No clipboard command detected.
+
+    ghopen: failed to open browser
+        The browser command was found but execution failed.
+
+    ghopen: failed to copy to clipboard
+        The clipboard command was found but execution failed.
+
+------------------------------------------------------------------------------
+vim:tw=78:ts=8:ft=help:norl:
